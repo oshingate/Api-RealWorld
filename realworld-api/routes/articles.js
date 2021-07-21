@@ -21,7 +21,13 @@ router.post('/', auth.isLoggedIn, async function (req, res, next) {
   res.json({ article: createdArticle });
 });
 
-/* get articles. */
+// get articles
+router.get('/', async function (req, res, next) {
+  let allArticles = await Article.find({});
+  res.json({ articles: allArticles });
+});
+
+/* get article by slug. */
 router.get('/:slug', auth.isLoggedIn, async function (req, res, next) {
   let slug = req.params.slug;
 

@@ -25,6 +25,10 @@ articleSchema.pre('save', async function (next) {
   next();
 });
 
+// articleSchema.methods.articleJson = async function () {
+//   return {};
+// };
+
 let Article = mongoose.model('Article', articleSchema);
 
 module.exports = Article;
