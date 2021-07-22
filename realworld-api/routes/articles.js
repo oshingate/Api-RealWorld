@@ -20,7 +20,14 @@ router.post('/', auth.isLoggedIn, async function (req, res, next) {
 
   res.json({ article: createdArticle });
 });
+/* get article by tag. */
+router.get('/tag/:tag', async function (req, res, next) {
+  let tag = req.params.tag;
 
+  let articles = await Article.find({ tagList: tag });
+
+  res.json({ articles: articles });
+});
 // get articles
 router.get('/', async function (req, res, next) {
   let allArticles = await Article.find({});
@@ -28,7 +35,7 @@ router.get('/', async function (req, res, next) {
 });
 
 /* get article by slug. */
-router.get('/:slug', auth.isLoggedIn, async function (req, res, next) {
+router.get('/:slug', async function (req, res, next) {
   let slug = req.params.slug;
 
   let article = await Article.findOne({ slug });

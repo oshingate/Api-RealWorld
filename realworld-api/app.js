@@ -32,9 +32,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-//setting ip
-app.listen(8080);
+app.use((req, res, next) => {
+  res.header({ 'Access-Control-Allow-Origin': '*' });
+  next();
+});
 
 app.use('/api', indexRouter);
 app.use('/api/users', usersRouter);
