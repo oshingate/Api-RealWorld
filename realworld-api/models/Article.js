@@ -11,9 +11,9 @@ let articleSchema = new Schema(
     description: { type: String },
     body: { type: String },
     tagList: [{ type: String }],
-    favorited: [{ type: mongoose.Types.ObjectId }],
+    favoritedBy: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
     favoritesCount: { type: Number, default: 0 },
-    author: { type: Object, require: true },
+    author: { type: mongoose.Types.ObjectId, require: true, ref: 'Profile' },
     comments: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
   },
   { timestamps: true }

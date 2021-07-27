@@ -7,11 +7,11 @@ var router = express.Router();
 
 //get profile by username
 
-router.get('/:username', auth.isLoggedIn, async (req, res, next) => {
+router.get('/:username', async (req, res, next) => {
   let username = req.params.username;
 
   try {
-    let profile = await Profile.findOne({ username });
+    let profile = await User.findOne({ username });
     if (!profile) {
       return res.status(400).json({ error: 'invalid profile name' });
     }

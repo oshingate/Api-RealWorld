@@ -11,12 +11,19 @@ router.get('/', function (req, res, next) {
 
 router.post('/register', async (req, res, next) => {
   let data = req.body;
+  if (!data.username || !data.password || !data.email) {
+    return res.status(400).json({
+      username: 'username cant be empty',
+      email: 'email cant be empty',
+      password: 'password cant be empty',
+    });
+  }
 
   try {
     let user = await User.findOne({ username: data.username });
 
     if (user) {
-      return res.status(400).json({ error: 'user already exist' });
+      return res.status(400).json({ username: 'user already exist' });
     }
 
     let createdUser = await User.create(data);
@@ -34,7 +41,8 @@ router.post('/login', async (req, res, next) => {
 
   if (!email || !password) {
     return res.status(400).json({
-      error: ' email/password required',
+      email: ' email/password required',
+      password: ' email/password required',
     });
   }
 
@@ -43,15 +51,15 @@ router.post('/login', async (req, res, next) => {
 
     if (!user) {
       return res.status(400).json({
-        error: ' user does not exist.',
+        email: ' user does not exist.',
       });
     }
-
-    let result = user.verifyPassword(password);
-
+    console.log('user', user);
+    let result = await user.verifyPassword(password);
+    console.log('result', result);
     if (!result) {
       return res.status(400).json({
-        error: ' incorrect password.',
+        password: ' incorrect password.',
       });
     }
 

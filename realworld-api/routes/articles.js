@@ -2,18 +2,21 @@ var express = require('express');
 const auth = require('../middlewares/auth');
 const Article = require('../models/Article');
 const Comment = require('../models/Comment');
+const Profile = require('../models/Profile');
 const User = require('../models/User');
 var router = express.Router();
 
 /* create new articles. */
 router.post('/', auth.isLoggedIn, async function (req, res, next) {
   let data = req.body;
-  data.author = req.user;
+  let loggedUser = await Profile.findOne({ username: req.user.username });
+  data.author = loggedUser._id;
+
   let createdArticle = await Article.create(data);
 
   let updatedUser = await User.findOneAndUpdate(
     {
-      username: createdArticle.author.username,
+      username: loggedUser.username,
     },
     { $push: { articles: createdArticle.id } }
   );
@@ -24,21 +27,28 @@ router.post('/', auth.isLoggedIn, async function (req, res, next) {
 router.get('/tag/:tag', async function (req, res, next) {
   let tag = req.params.tag;
 
-  let articles = await Article.find({ tagList: tag });
+  let articles = await Article.find({ tagList: tag }).populate('author');
 
   res.json({ articles: articles });
 });
 // get articles
 router.get('/', async function (req, res, next) {
-  let allArticles = await Article.find({});
+  let allArticles = await Article.find({}).populate('author');
   res.json({ articles: allArticles });
+});
+// favourate article by slug
+
+router.get('/:slug/favorite', auth.isLoggedIn, async function (req, res, next) {
+  let slug = req.params.slug;
+  console.log('req.user', req.user);
+  // let article = await Article.findOne({ slug }).populate('author');
 });
 
 /* get article by slug. */
 router.get('/:slug', async function (req, res, next) {
   let slug = req.params.slug;
 
-  let article = await Article.findOne({ slug });
+  let article = await Article.findOne({ slug }).populate('author');
 
   res.json({ article: article });
 });

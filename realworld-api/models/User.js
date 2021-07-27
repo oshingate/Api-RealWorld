@@ -14,6 +14,7 @@ let userSchema = new Schema({
   image: { type: String, default: null },
   profile: { type: mongoose.Types.ObjectId, ref: 'Profile' },
   articles: [{ type: mongoose.Types.ObjectId, ref: 'Article' }],
+  favoritedArticles: [{ type: mongoose.Types.ObjectId, ref: 'Article' }],
   comments: [{ type: mongoose.Types.ObjectId, red: 'Comment' }],
 });
 
@@ -37,6 +38,7 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.verifyPassword = async function (password) {
   try {
     let result = await bcrypt.compare(password, this.password);
+
     return result;
   } catch (error) {
     return error;
