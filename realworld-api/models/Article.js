@@ -20,14 +20,9 @@ let articleSchema = new Schema(
 );
 
 articleSchema.pre('save', async function (next) {
-  // this.tagList = this.tagList.split(',');
   this.slug = slugger(this.title);
   next();
 });
-
-// articleSchema.methods.articleJson = async function () {
-//   return {};
-// };
 
 let Article = mongoose.model('Article', articleSchema);
 

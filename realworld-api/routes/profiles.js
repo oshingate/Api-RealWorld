@@ -7,11 +7,27 @@ var router = express.Router();
 
 //get profile by username
 
-router.get('/:username', async (req, res, next) => {
+router.get('/:username', auth.isLoggedIn, async (req, res, next) => {
   let username = req.params.username;
 
   try {
-    let profile = await User.findOne({ username });
+    let profile = await User.findOne({ username })
+      .populate({
+        path: 'articles',
+        populate: {
+          path: 'author',
+        },
+      })
+      .populate({
+        path: 'profile',
+      })
+      .populate({
+        path: 'favoritedArticles',
+        populate: {
+          path: 'author',
+        },
+      });
+
     if (!profile) {
       return res.status(400).json({ error: 'invalid profile name' });
     }
@@ -46,7 +62,7 @@ router.post('/:username/follow', auth.isLoggedIn, async (req, res, next) => {
       $push: { followers: currentUser.id },
     });
 
-    return res.json({ loggedUser: currentUser, followedUser: updatedTarget });
+    return res.json({ user: updatedTarget });
   } catch (error) {
     next(error);
   }
@@ -77,7 +93,7 @@ router.delete('/:username/follow', auth.isLoggedIn, async (req, res, next) => {
       $pull: { followers: currentUser.id },
     });
 
-    return res.json({ loggedUser: currentUser, followedUser: updatedTarget });
+    return res.json({ user: updatedTarget });
   } catch (error) {
     next(error);
   }

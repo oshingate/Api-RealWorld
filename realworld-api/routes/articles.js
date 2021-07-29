@@ -31,24 +31,68 @@ router.get('/tag/:tag', async function (req, res, next) {
 
   res.json({ articles: articles });
 });
+
 // get articles
 router.get('/', async function (req, res, next) {
   let allArticles = await Article.find({}).populate('author');
   res.json({ articles: allArticles });
 });
+
 // favourate article by slug
 
-router.get('/:slug/favorite', auth.isLoggedIn, async function (req, res, next) {
-  let slug = req.params.slug;
-  console.log('req.user', req.user);
-  // let article = await Article.findOne({ slug }).populate('author');
-});
+router.post(
+  '/:slug/favorite',
+  auth.isLoggedIn,
+  async function (req, res, next) {
+    let slug = req.params.slug;
+    let username = req.user.username;
+
+    let loggedUser = await User.findOne({ username });
+
+    let updatedArticle = await Article.findOneAndUpdate(
+      { slug },
+      { $push: { favoritedBy: loggedUser._id }, $inc: { favoritesCount: 1 } }
+    );
+
+    let updatedUser = await User.findByIdAndUpdate(loggedUser._id, {
+      $push: { favoritedArticles: updatedArticle._id },
+    });
+
+    res.json({ user: updatedUser });
+  }
+);
+
+//remove favourate article by slug
+
+router.delete(
+  '/:slug/favorite',
+  auth.isLoggedIn,
+  async function (req, res, next) {
+    let slug = req.params.slug;
+    let username = req.user.username;
+
+    let loggedUser = await User.findOne({ username });
+
+    let updatedArticle = await Article.findOneAndUpdate(
+      { slug },
+      { $pull: { favoritedBy: loggedUser._id }, $inc: { favoritesCount: -1 } }
+    );
+
+    let updatedUser = await User.findByIdAndUpdate(loggedUser._id, {
+      $pull: { favoritedArticles: updatedArticle._id },
+    });
+
+    res.json({ user: updatedUser });
+  }
+);
 
 /* get article by slug. */
 router.get('/:slug', async function (req, res, next) {
   let slug = req.params.slug;
 
-  let article = await Article.findOne({ slug }).populate('author');
+  let article = await Article.findOne({ slug })
+    .populate('author')
+    .populate('comments');
 
   res.json({ article: article });
 });
@@ -141,7 +185,7 @@ router.delete(
       { $pull: { comments: deletedComment.id } }
     );
 
-    res.json({ user: updatedUser });
+    res.json({ comment: deletedComment });
   }
 );
 module.exports = router;
