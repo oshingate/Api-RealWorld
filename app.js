@@ -8,6 +8,7 @@ var cors = require('cors');
 require('dotenv').config();
 
 var indexRouter = require('./routes/index');
+var irouter = require('./routes/irouter');
 var usersRouter = require('./routes/users');
 var userRouter = require('./routes/user');
 var profilesRouter = require('./routes/profiles');
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
 
+app.use('/', irouter);
 app.use('/api', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/user', userRouter);
