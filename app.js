@@ -8,7 +8,7 @@ var cors = require('cors');
 require('dotenv').config();
 
 var indexRouter = require('./routes/index');
-var irouter = require('./routes/irouter');
+
 var usersRouter = require('./routes/users');
 var userRouter = require('./routes/user');
 var profilesRouter = require('./routes/profiles');
