@@ -5,7 +5,7 @@ let _ = require('lodash');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.json({ hello: 'hello' });
 });
 
 /* GET tags . */
