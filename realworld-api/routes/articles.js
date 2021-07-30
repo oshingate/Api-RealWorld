@@ -51,14 +51,15 @@ router.post(
 
     let updatedArticle = await Article.findOneAndUpdate(
       { slug },
-      { $push: { favoritedBy: loggedUser._id }, $inc: { favoritesCount: 1 } }
+      { $push: { favoritedBy: loggedUser._id }, $inc: { favoritesCount: 1 } },
+      { returnNewDocument: true }
     );
 
     let updatedUser = await User.findByIdAndUpdate(loggedUser._id, {
       $push: { favoritedArticles: updatedArticle._id },
     });
 
-    res.json({ user: updatedUser });
+    res.json({ article: updatedArticle });
   }
 );
 
@@ -75,14 +76,15 @@ router.delete(
 
     let updatedArticle = await Article.findOneAndUpdate(
       { slug },
-      { $pull: { favoritedBy: loggedUser._id }, $inc: { favoritesCount: -1 } }
+      { $pull: { favoritedBy: loggedUser._id }, $inc: { favoritesCount: -1 } },
+      { returnNewDocument: true }
     );
 
     let updatedUser = await User.findByIdAndUpdate(loggedUser._id, {
       $pull: { favoritedArticles: updatedArticle._id },
     });
 
-    res.json({ user: updatedUser });
+    res.json({ article: updatedArticle });
   }
 );
 
