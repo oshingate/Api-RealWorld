@@ -41,9 +41,11 @@ router.get('/:username', auth.isLoggedIn, async (req, res, next) => {
 
 router.post('/:username/follow', auth.isLoggedIn, async (req, res, next) => {
   let username = req.params.username;
-  loggedUser = req.user;
+  let loggedUser = req.user;
   try {
     let targetProfile = await Profile.findOne({ username });
+    let targetUser = await User.findOne({ username });
+    let loggedUserData = await User.findOne({ username: loggedUser.username });
     if (!targetProfile) {
       return res.json({ error: 'invalid profile username' });
     }
@@ -55,11 +57,11 @@ router.post('/:username/follow', auth.isLoggedIn, async (req, res, next) => {
       {
         username: loggedUser.username,
       },
-      { $push: { following: targetProfile.id } }
+      { $push: { following: targetUser.id } }
     );
 
     let updatedTarget = await Profile.findByIdAndUpdate(targetProfile.id, {
-      $push: { followers: currentUser.id },
+      $push: { followers: loggedUserData.id },
     });
 
     return res.json({ user: updatedTarget });
@@ -75,6 +77,8 @@ router.delete('/:username/follow', auth.isLoggedIn, async (req, res, next) => {
   loggedUser = req.user;
   try {
     let targetProfile = await Profile.findOne({ username });
+    let targetUser = await User.findOne({ username });
+    let loggedUserData = await User.findOne({ username: loggedUser.username });
     if (!targetProfile) {
       return res.json({ error: 'invalid profile username' });
     }
@@ -86,11 +90,11 @@ router.delete('/:username/follow', auth.isLoggedIn, async (req, res, next) => {
       {
         username: loggedUser.username,
       },
-      { $pull: { following: targetProfile.id } }
+      { $pull: { following: targetUser.id } }
     );
 
     let updatedTarget = await Profile.findByIdAndUpdate(targetProfile.id, {
-      $pull: { followers: currentUser.id },
+      $pull: { followers: loggedUserData.id },
     });
 
     return res.json({ user: updatedTarget });

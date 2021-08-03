@@ -50,4 +50,13 @@ router.put('/', auth.isLoggedIn, async (req, res, next) => {
   }
 });
 
+//get all articles of following user
+
+router.get('/following', auth.isLoggedIn, async (req, res, next) => {
+  let loggedprofile = await Profile.findOne({
+    username: req.user.username,
+  }).populate('following');
+  console.log(loggedprofile);
+});
+
 module.exports = router;
