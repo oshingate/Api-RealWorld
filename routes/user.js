@@ -3,6 +3,7 @@ var jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
 const auth = require('../middlewares/auth');
+const _ = require('lodash');
 var router = express.Router();
 
 /* GET  user data. */
@@ -55,8 +56,20 @@ router.put('/', auth.isLoggedIn, async (req, res, next) => {
 router.get('/following', auth.isLoggedIn, async (req, res, next) => {
   let loggedprofile = await Profile.findOne({
     username: req.user.username,
-  }).populate('following');
+  }).populate({
+    path: 'following',
+    populate: {
+      path: 'articles',
+    },
+  });
   console.log(loggedprofile);
+  let followingArray = loggedprofile.following;
+
+  let articles = followingArray.map((user, i) => {
+    return user.articles;
+  });
+
+  res.json({ articles: _.flattenDeep(articles) });
 });
 
 module.exports = router;
